@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 
 [RequireComponent(typeof(LineRenderer), typeof(Rigidbody))]
-public abstract class PhysicsEngine : MonoBehaviour
+public class PhysicsEngine : MonoBehaviour
 {
     public float Mass // [kg]
     {
@@ -26,17 +27,12 @@ public abstract class PhysicsEngine : MonoBehaviour
     protected Vector3 gravityTargetOffset;
     [SerializeField] private float gravity = 9.81f;
 
-    [SerializeField] private bool autoOrient;
-    [SerializeField] private float autoOrientSpeed = 1f;
-
     // Trails
     [SerializeField] private bool drawTrails;
     private LineRenderer lineRenderer;
     [SerializeField] private float trailOffsetScale = .1f;
 
-    private bool grounded;
-    public bool OverrideGroundedCheck;
-    [SerializeField] private float groundedCheckDistance = 1.25f;
+    [SerializeField] private bool useGravity = true;
 
     private void Awake()
     {
@@ -46,23 +42,14 @@ public abstract class PhysicsEngine : MonoBehaviour
 
     void FixedUpdate()
     {
-        ProcessGravity();
         RenderTrails();
+        if (useGravity)
+            ProcessGravity();
     }
 
     protected void Update()
     {
-        // Checks to see if the object is grounded
-        Ray ray = new Ray(transform.position, -gravityTargetOffset);
-        grounded = Physics.Raycast(ray, groundedCheckDistance);
-        if (OverrideGroundedCheck)
-        {
-            // rb.isKinematic = false;
-        }
-        else
-        {
-            // rb.isKinematic = grounded;
-        }
+        // 
     }
 
     void ProcessGravity()
@@ -76,14 +63,6 @@ public abstract class PhysicsEngine : MonoBehaviour
 
         // Update Last Velocity
         lastVelocity = rb.velocity;
-
-        if (autoOrient) AutoOrient();
-    }
-
-    private void AutoOrient()
-    {
-        Quaternion orientRotation = Quaternion.FromToRotation(-transform.up, gravityTargetOffset) * transform.rotation;
-        transform.rotation = Quaternion.Slerp(transform.rotation, orientRotation, Time.deltaTime * autoOrientSpeed);
     }
 
     // Use this for initialization
@@ -111,5 +90,14 @@ public abstract class PhysicsEngine : MonoBehaviour
         {
             lineRenderer.enabled = false;
         }
+    }
+
+    public void SetMass(string s)
+    {
+        float mass;
+        if (Utils.ParseFloat(s, out mass))
+        {
+            Mass = mass;
+        };
     }
 }

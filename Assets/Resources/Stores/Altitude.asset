@@ -13,5 +13,7 @@ MonoBehaviour:
   m_Name: Altitude
   m_EditorClassIdentifier: 
   defaultValue: 0
-  shouldRound: 0
+  shouldRound: 1
   roundTo: 1
+  hasMaxValue: 0
+  maxValue: 0

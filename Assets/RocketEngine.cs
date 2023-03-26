@@ -20,6 +20,9 @@ public abstract partial class RocketEngine : MonoBehaviour
     protected float yaw;
     protected float roll;
 
+    [SerializeField] private bool active;
+    public bool Active { get { return active; } set { active = value; } }
+
     private void Awake()
     {
         physicsEngine = GetComponent<PhysicsEngine>();
@@ -33,9 +36,10 @@ public abstract partial class RocketEngine : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (!Active) return;
+
         if (fuelCapacity > FuelThisUpdate())
         {
-            physicsEngine.OverrideGroundedCheck = true;
             fuelCapacity -= FuelThisUpdate();
             physicsEngine.Mass -= FuelThisUpdate();
 
@@ -43,7 +47,6 @@ public abstract partial class RocketEngine : MonoBehaviour
         }
         else
         {
-            physicsEngine.OverrideGroundedCheck = true;
             if (logOutOfFuel)
                 Debug.LogWarning("Out of Rocket Fuel");
         }
@@ -103,6 +106,15 @@ public abstract partial class RocketEngine : MonoBehaviour
     public void FullyRefuel()
     {
         fuelCapacity = fullFuelCapacity;
+    }
+
+    public void SetMaxThrust(string s)
+    {
+        float maxThrust;
+        if (Utils.ParseFloat(s, out maxThrust))
+        {
+            this.maxThrust = maxThrust;
+        };
     }
 }
 

@@ -4,7 +4,10 @@ using TMPro;
 public class NumStoreDisplay : StoreDisplay
 {
     [SerializeField] private NumStore store;
-    public override string StringContent => LabelContent + store.GetValue().ToString();
+
+    public override string StringContent => LabelContent + store.GetValue().ToString() + Suffix;
+
+
 
     private TextMeshProUGUI text;
 

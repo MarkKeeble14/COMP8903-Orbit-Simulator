@@ -9,7 +9,7 @@ public class RocketEngineControl : MonoBehaviour
     [SerializeField] private KeyCode controlEnable = KeyCode.Space;
     [SerializeField] private KeyCode controlThrustPercentDown = KeyCode.DownArrow;
     [SerializeField] private KeyCode controlThrustPercentUp = KeyCode.UpArrow;
-    [SerializeField] private KeyCode controlRefuel = KeyCode.Tab;
+    [SerializeField] private KeyCode controlRefuel = KeyCode.R;
 
     [SerializeField] private bool allowTurnEngineOff;
     [SerializeField] private float adjustThrustPercentRate = 1f;
@@ -22,7 +22,7 @@ public class RocketEngineControl : MonoBehaviour
         // 
         engine = GetComponent<RocketEngine>();
 
-        if (engine.enabled)
+        if (engine.Active)
             rocketEnabledDisplay.On();
         else
             rocketEnabledDisplay.Off();
@@ -36,13 +36,13 @@ public class RocketEngineControl : MonoBehaviour
         {
             if (allowTurnEngineOff)
             {
-                engine.enabled = !engine.enabled;
+                engine.Active = !engine.Active;
             }
             else
             {
-                engine.enabled = true;
+                engine.Active = true;
             }
-            if (engine.enabled)
+            if (engine.Active)
                 rocketEnabledDisplay.On();
             else
                 rocketEnabledDisplay.Off();
