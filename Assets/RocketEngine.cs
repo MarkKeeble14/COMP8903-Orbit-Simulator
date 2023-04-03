@@ -55,7 +55,7 @@ public abstract partial class RocketEngine : MonoBehaviour
     protected void Update()
     {
         // Adjust Rotation
-        transform.rotation = Quaternion.Euler(new Vector3(roll, pitch, yaw));
+//        transform.rotation = Quaternion.Euler(new Vector3(roll, pitch, yaw));
     }
 
     public void AdjustRotation(RotType type, float v)
@@ -64,12 +64,15 @@ public abstract partial class RocketEngine : MonoBehaviour
         {
             case RotType.PITCH:
                 pitch += v;
+                transform.Rotate(Vector3.right, v);
                 break;
             case RotType.YAW:
                 yaw += v;
+                transform.Rotate(Vector3.forward, v);
                 break;
             case RotType.ROLL:
                 roll += v;
+                transform.Rotate(Vector3.up, v);
                 break;
         }
     }

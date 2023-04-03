@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
 
+
 [RequireComponent(typeof(LineRenderer), typeof(Rigidbody))]
 public class PhysicsEngine : MonoBehaviour
 {
@@ -17,6 +18,11 @@ public class PhysicsEngine : MonoBehaviour
             rb.mass = value;
         }
     }
+
+    public ScientificNotation planetMass = new ScientificNotation(1.5f, 17);
+    public ScientificNotation rocketMass = new ScientificNotation(1.0f, 3);
+
+    public ScientificNotation gConst = new ScientificNotation(6.674f, -11);
     public Vector3 VelocityVector => rb.velocity; // [m s^-1]
     private Vector3 lastVelocity;
     protected Vector3 accelerationVector;
@@ -25,7 +31,7 @@ public class PhysicsEngine : MonoBehaviour
 
     [SerializeField] protected Transform gravityTarget;
     protected Vector3 gravityTargetOffset;
-    [SerializeField] private float gravity = 9.81f;
+//    [SerializeField] private float gravity = 9.81f;
 
     // Trails
     [SerializeField] private bool drawTrails;
@@ -54,12 +60,16 @@ public class PhysicsEngine : MonoBehaviour
 
     void ProcessGravity()
     {
+        //Find Local Gravity
+        Vector3 gSource = gravityTarget.position - transform.position;
+        float gravForce = (float)(gConst * ((planetMass * new ScientificNotation(Mass, 0)) / new ScientificNotation(gSource.magnitude * gSource.magnitude, 0)));
+
         // Find Acceleration Vector
         accelerationVector = (rb.velocity - lastVelocity) / Mass;
 
         // Find Direction of Gravity
-        gravityTargetOffset = transform.position - gravityTarget.position;
-        rb.AddForce(-gravityTargetOffset.normalized * gravity * rb.mass);
+        Debug.Log("a: " + gravForce / (float)rocketMass);
+        rb.AddForce(gSource.normalized * gravForce);
 
         // Update Last Velocity
         lastVelocity = rb.velocity;
