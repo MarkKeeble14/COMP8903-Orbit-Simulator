@@ -25,6 +25,7 @@ public class RocketCameraController : MonoBehaviour
     [SerializeField] float frequency = 25;
     [SerializeField] Vector3 maximumTranslationShake = Vector3.one * 0.5f;
     Vector3 shake;
+    public bool ShakeActive;
 
     private void Awake()
     {
@@ -38,10 +39,11 @@ public class RocketCameraController : MonoBehaviour
         Vector3 lookDirection;
         Vector3 lookPosition;
 
+
         shake = new Vector3(
-            maximumTranslationShake.x * (Mathf.PerlinNoise(seed, Time.time * frequency) * 2 - 1),
-            maximumTranslationShake.y * (Mathf.PerlinNoise(seed + 1, Time.time * frequency) * 2 - 1),
-            maximumTranslationShake.z * (Mathf.PerlinNoise(seed + 2, Time.time * frequency) * 2 - 1)
+            maximumTranslationShake.x * (Mathf.PerlinNoise(seed, Time.unscaledTime * frequency) * 2 - 1),
+            maximumTranslationShake.y * (Mathf.PerlinNoise(seed + 1, Time.unscaledTime * frequency) * 2 - 1),
+            maximumTranslationShake.z * (Mathf.PerlinNoise(seed + 2, Time.unscaledTime * frequency) * 2 - 1)
         ) * 0.5f;
 
         switch (mode)
@@ -50,7 +52,7 @@ public class RocketCameraController : MonoBehaviour
                 lookRotation = Quaternion.Euler(new Vector2(rotParallel, rotPerpendicular));
                 lookDirection = lookRotation * Vector3.forward;
                 lookPosition = followedObject.position - lookDirection * distance;
-                transform.SetPositionAndRotation(lookPosition + shake, lookRotation);
+                transform.SetPositionAndRotation(lookPosition + (ShakeActive ? shake : Vector3.zero), lookRotation);
 
                 break;
             case CameraMode.ORBITAL:
@@ -58,7 +60,7 @@ public class RocketCameraController : MonoBehaviour
                     Vector3.Angle(Vector3.up, followedObject.gameObject.GetComponent<Rigidbody>().velocity)));
                 lookDirection = lookRotation * Vector3.forward;
                 lookPosition = followedObject.position - lookDirection * distance;
-                transform.SetPositionAndRotation(lookPosition, lookRotation);
+                transform.SetPositionAndRotation(lookPosition + (ShakeActive ? shake : Vector3.zero), lookRotation);
                 break;
         }
 

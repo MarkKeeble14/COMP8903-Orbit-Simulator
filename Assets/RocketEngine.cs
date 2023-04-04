@@ -34,6 +34,8 @@ public abstract partial class RocketEngine : MonoBehaviour
     [Header("Audio")]
     [SerializeField] private ContinuousAudioSource thrustersSFX;
 
+    [SerializeField] private RocketCameraController[] rocketCameraControllers;
+
     private void Awake()
     {
         physicsEngine = GetComponent<PhysicsEngine>();
@@ -49,6 +51,12 @@ public abstract partial class RocketEngine : MonoBehaviour
     {
         bool thrustersAreFiring = thrustPercent > 0 && Active && fuelCapacity > 0;
         thrustersSFX.Active = thrustersAreFiring;
+
+        foreach (RocketCameraController cameraController in rocketCameraControllers)
+        {
+            cameraController.ShakeActive = thrustersAreFiring;
+        }
+
 
         if (!thrustersAreFiring) return;
 
