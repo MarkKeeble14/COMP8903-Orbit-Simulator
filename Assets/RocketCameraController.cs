@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class RocketCameraController : MonoBehaviour
 {
-
     public enum CameraMode
     {
         FIXED,
@@ -22,29 +21,40 @@ public class RocketCameraController : MonoBehaviour
     float rotPerpendicular;
     float rotParallel;
 
-    // Start is called before the first frame update
-    void Start()
+    private float seed;
+    [SerializeField] float frequency = 25;
+    [SerializeField] Vector3 maximumTranslationShake = Vector3.one * 0.5f;
+    Vector3 shake;
+
+    private void Awake()
     {
-        
+        seed = Random.value;
     }
 
     // Update is called once per frame
     void Update()
     {
-
         Quaternion lookRotation;
         Vector3 lookDirection;
         Vector3 lookPosition;
 
-        switch (mode) {
+        shake = new Vector3(
+            maximumTranslationShake.x * (Mathf.PerlinNoise(seed, Time.time * frequency) * 2 - 1),
+            maximumTranslationShake.y * (Mathf.PerlinNoise(seed + 1, Time.time * frequency) * 2 - 1),
+            maximumTranslationShake.z * (Mathf.PerlinNoise(seed + 2, Time.time * frequency) * 2 - 1)
+        ) * 0.5f;
+
+        switch (mode)
+        {
             case CameraMode.FIXED:
                 lookRotation = Quaternion.Euler(new Vector2(rotParallel, rotPerpendicular));
                 lookDirection = lookRotation * Vector3.forward;
                 lookPosition = followedObject.position - lookDirection * distance;
-                transform.SetPositionAndRotation(lookPosition, lookRotation);
+                transform.SetPositionAndRotation(lookPosition + shake, lookRotation);
+
                 break;
             case CameraMode.ORBITAL:
-                lookRotation = Quaternion.Euler(new Vector3(rotParallel, rotPerpendicular, 
+                lookRotation = Quaternion.Euler(new Vector3(rotParallel, rotPerpendicular,
                     Vector3.Angle(Vector3.up, followedObject.gameObject.GetComponent<Rigidbody>().velocity)));
                 lookDirection = lookRotation * Vector3.forward;
                 lookPosition = followedObject.position - lookDirection * distance;
@@ -52,16 +62,19 @@ public class RocketCameraController : MonoBehaviour
                 break;
         }
 
+        /*
         if (Input.GetKeyDown(KeyCode.V))
         {
-            if(mode == CameraMode.FIXED)
+            if (mode == CameraMode.FIXED)
             {
                 mode = CameraMode.ORBITAL;
-            } else
+            }
+            else
             {
                 mode = CameraMode.FIXED;
             }
         }
+        */
 
         // Rotation
         if (Input.GetKey(KeyCode.UpArrow))
@@ -72,7 +85,6 @@ public class RocketCameraController : MonoBehaviour
         {
             rotParallel -= 30.0f * Time.deltaTime;
         }
-
 
         if (Input.GetKey(KeyCode.LeftArrow))
         {

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -23,6 +24,7 @@ public class PhysicsEngine : MonoBehaviour
     public ScientificNotation rocketMass = new ScientificNotation(1.0f, 3);
 
     public ScientificNotation gConst = new ScientificNotation(6.674f, -11);
+
     public Vector3 VelocityVector => rb.velocity; // [m s^-1]
     private Vector3 lastVelocity;
     protected Vector3 accelerationVector;
@@ -30,8 +32,7 @@ public class PhysicsEngine : MonoBehaviour
     private Rigidbody rb;
 
     [SerializeField] protected Transform gravityTarget;
-    protected Vector3 gravityTargetOffset;
-//    [SerializeField] private float gravity = 9.81f;
+    //    [SerializeField] private float gravity = 9.81f;
 
     // Trails
     [SerializeField] private bool drawTrails;
@@ -53,9 +54,9 @@ public class PhysicsEngine : MonoBehaviour
             ProcessGravity();
     }
 
-    protected void Update()
+    public void SetVelocity(Vector3 velocity)
     {
-        // 
+        rb.velocity = velocity;
     }
 
     void ProcessGravity()
@@ -64,14 +65,12 @@ public class PhysicsEngine : MonoBehaviour
         Vector3 gSource = gravityTarget.position - transform.position;
         float gravForce = (float)(gConst * ((planetMass * new ScientificNotation(Mass, 0)) / new ScientificNotation(gSource.magnitude * gSource.magnitude, 0)));
 
-        // Find Acceleration Vector
-        accelerationVector = (rb.velocity - lastVelocity) / Mass;
-
         // Find Direction of Gravity
-        Debug.Log("a: " + gravForce / (float)rocketMass);
+        // Debug.Log("a: " + gravForce / (float)rocketMass);
         rb.AddForce(gSource.normalized * gravForce);
 
-        // Update Last Velocity
+        // Find Acceleration Vector
+        accelerationVector = (rb.velocity - lastVelocity) / Time.fixedDeltaTime;
         lastVelocity = rb.velocity;
     }
 
@@ -100,6 +99,11 @@ public class PhysicsEngine : MonoBehaviour
         {
             lineRenderer.enabled = false;
         }
+    }
+
+    public Transform GetGravityTarget()
+    {
+        return gravityTarget;
     }
 
     public void SetMass(string s)

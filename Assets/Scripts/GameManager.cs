@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
 
     private int cameraFocusTracker;
     [SerializeField] private CameraFocus currentCameraFocus;
-    [SerializeField] private SerializableDictionary<CameraFocus, GameObject> cameraFocusDict = new SerializableDictionary<CameraFocus, GameObject>();
+    [SerializeField] private SerializableDictionary<CameraFocus, GameObjectStateData[]> cameraFocusDict = new SerializableDictionary<CameraFocus, GameObjectStateData[]>();
 
     public void NextCameraFocus()
     {
@@ -29,12 +29,10 @@ public class GameManager : MonoBehaviour
 
     public void SetCamera(CameraFocus focus)
     {
-        foreach (SerializableKeyValuePair<CameraFocus, GameObject> kvp in cameraFocusDict.ToList())
+        SerializableKeyValuePair<CameraFocus, GameObjectStateData[]> kvp = cameraFocusDict.GetEntry(focus);
+        foreach (GameObjectStateData obj in kvp.Value)
         {
-            if (kvp.Key == focus)
-                kvp.Value.SetActive(true);
-            else
-                kvp.Value.SetActive(false);
+            obj.GameObject.SetActive(obj.State == GameObjectState.ENABLED ? true : false);
         }
     }
 

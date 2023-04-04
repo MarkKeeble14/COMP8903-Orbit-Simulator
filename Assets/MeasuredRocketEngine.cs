@@ -17,7 +17,7 @@ public class MeasuredRocketEngine : RocketEngine
         base.Start();
     }
 
-    private new void Update()
+    protected new void Update()
     {
         maxThrustStore.SetValue(maxThrust);
         thrustPercentStore.SetValue(thrustPercent);
@@ -26,6 +26,7 @@ public class MeasuredRocketEngine : RocketEngine
         rollStore.SetValue(roll);
         pitchStore.SetValue(pitch);
         yawStore.SetValue(yaw);
+
         base.Update();
     }
 }

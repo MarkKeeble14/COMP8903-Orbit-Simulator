@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 public abstract partial class RocketEngine : MonoBehaviour
 {
@@ -23,6 +22,18 @@ public abstract partial class RocketEngine : MonoBehaviour
     [SerializeField] private bool active;
     public bool Active { get { return active; } set { active = value; } }
 
+    [SerializeField] private Flame flamePrefab;
+    [SerializeField] private Smoke smokePrefab;
+    [SerializeField] private Transform enginePosition;
+    [SerializeField] private Vector2 minMaxFlamesVisualsMultiplier = new Vector2(1, 5);
+
+    [Header("Smoke Stats")]
+    [SerializeField] private int numSmokePerFlame = 3;
+    [SerializeField] private float flameSpeed;
+
+    [Header("Audio")]
+    [SerializeField] private ContinuousAudioSource thrustersSFX;
+
     private void Awake()
     {
         physicsEngine = GetComponent<PhysicsEngine>();
@@ -32,6 +43,35 @@ public abstract partial class RocketEngine : MonoBehaviour
     protected void Start()
     {
         physicsEngine.Mass += fuelCapacity;
+    }
+
+    protected void Update()
+    {
+        bool thrustersAreFiring = thrustPercent > 0 && Active && fuelCapacity > 0;
+        thrustersSFX.Active = thrustersAreFiring;
+
+        if (!thrustersAreFiring) return;
+
+        int mult = Mathf.RoundToInt(Mathf.Lerp(minMaxFlamesVisualsMultiplier.x, minMaxFlamesVisualsMultiplier.y, thrustPercent));
+        for (int i = 0; i < mult; i++)
+        {
+            // Spawn Flame
+            Flame flame = Instantiate(flamePrefab, enginePosition.position, Quaternion.identity);
+
+            // Add force to flame
+            Vector3 force = -transform.up * flameSpeed;
+            flame.Set(physicsEngine.VelocityVector, force, physicsEngine, physicsEngine.GetGravityTarget());
+            SpawnSmoke(physicsEngine.VelocityVector, force, numSmokePerFlame);
+        }
+    }
+
+    private void SpawnSmoke(Vector3 velocity, Vector3 force, int numToSpawn)
+    {
+        for (int i = 0; i < numToSpawn; i++)
+        {
+            Smoke spawned = Instantiate(smokePrefab, enginePosition.position, Quaternion.identity);
+            spawned.Set(velocity, force, physicsEngine.GetGravityTarget());
+        }
     }
 
     void FixedUpdate()
@@ -47,15 +87,10 @@ public abstract partial class RocketEngine : MonoBehaviour
         }
         else
         {
+            fuelCapacity = 0;
             if (logOutOfFuel)
                 Debug.LogWarning("Out of Rocket Fuel");
         }
-    }
-
-    protected void Update()
-    {
-        // Adjust Rotation
-//        transform.rotation = Quaternion.Euler(new Vector3(roll, pitch, yaw));
     }
 
     public void AdjustRotation(RotType type, float v)
@@ -88,6 +123,7 @@ public abstract partial class RocketEngine : MonoBehaviour
 
     void ExertForce()
     {
+        if (thrustPercent <= 0) return;
         currentThrust = thrustPercent * maxThrust * kilogramToGramConversion;
         Vector3 thrustVector = transform.up * currentThrust; // N
         physicsEngine.AddForce(thrustVector);

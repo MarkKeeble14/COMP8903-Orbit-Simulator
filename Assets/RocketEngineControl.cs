@@ -7,8 +7,6 @@ public class RocketEngineControl : MonoBehaviour
 {
     private RocketEngine engine;
     [SerializeField] private KeyCode controlEnable = KeyCode.Space;
-    [SerializeField] private KeyCode controlThrustPercentDown = KeyCode.LeftControl;
-    [SerializeField] private KeyCode controlThrustPercentUp = KeyCode.LeftShift;
     [SerializeField] private KeyCode controlRefuel = KeyCode.R;
 
     [SerializeField] private bool allowTurnEngineOff;
