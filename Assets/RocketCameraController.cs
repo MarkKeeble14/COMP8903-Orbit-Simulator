@@ -81,20 +81,20 @@ public class RocketCameraController : MonoBehaviour
         // Rotation
         if (Input.GetKey(KeyCode.UpArrow))
         {
-            rotParallel += 30.0f * Time.deltaTime;
+            rotParallel += 30.0f * Time.unscaledDeltaTime;
         }
         else if (Input.GetKey(KeyCode.DownArrow))
         {
-            rotParallel -= 30.0f * Time.deltaTime;
+            rotParallel -= 30.0f * Time.unscaledDeltaTime;
         }
 
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            rotPerpendicular += 30.0f * Time.deltaTime;
+            rotPerpendicular += 30.0f * Time.unscaledDeltaTime;
         }
         else if (Input.GetKey(KeyCode.RightArrow))
         {
-            rotPerpendicular -= 30.0f * Time.deltaTime;
+            rotPerpendicular -= 30.0f * Time.unscaledDeltaTime;
         }
     }
 }

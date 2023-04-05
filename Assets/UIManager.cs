@@ -57,6 +57,10 @@ public class UIManager : MonoBehaviour
                 {
                     activeTimeScale.SetValue(possibleTimeScales[4]);
                 }
+                if (Input.GetKeyDown(KeyCode.Alpha6))
+                {
+                    activeTimeScale.SetValue(possibleTimeScales[5]);
+                }
             }
         }
 

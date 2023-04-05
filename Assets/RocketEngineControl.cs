@@ -63,20 +63,20 @@ public class RocketEngineControl : MonoBehaviour
         }
 
         // Rotation
-        if (Input.GetKey(KeyCode.W))
+        if (Input.GetKey(KeyCode.S))
         {
             engine.AdjustRotation(RotType.PITCH, Time.deltaTime * rotationSpeed);
         }
-        else if (Input.GetKey(KeyCode.S))
+        else if (Input.GetKey(KeyCode.W))
         {
             engine.AdjustRotation(RotType.PITCH, Time.deltaTime * -rotationSpeed);
         }
         // 
-        if (Input.GetKey(KeyCode.A))
+        if (Input.GetKey(KeyCode.D))
         {
             engine.AdjustRotation(RotType.YAW, Time.deltaTime * rotationSpeed);
         }
-        else if (Input.GetKey(KeyCode.D))
+        else if (Input.GetKey(KeyCode.A))
         {
             engine.AdjustRotation(RotType.YAW, Time.deltaTime * -rotationSpeed);
         }

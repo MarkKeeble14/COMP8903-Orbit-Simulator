@@ -28,12 +28,28 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private List<DialogueSnippet> onStartDialogue;
     [SerializeField] private GameObject dialogueContainer;
 
+    private string playOnStartDialogueKey = "PlayOnStartDialogue";
+
+    [ContextMenu("SetPlayDialogue")]
+    public void SetPlayDialogue()
+    {
+        PlayerPrefs.SetInt(playOnStartDialogueKey, 1);
+    }
+
     private void Awake()
     {
-        if (!PlayerPrefs.HasKey("OnStartDialoguePlayed"))
+        if (!PlayerPrefs.HasKey(playOnStartDialogueKey))
         {
             StartCoroutine(ExecuteDialogue(onStartDialogue));
-            PlayerPrefs.SetInt("OnStartDialoguePlayed", 1);
+            PlayerPrefs.SetInt(playOnStartDialogueKey, 0);
+        }
+        else
+        {
+            if (PlayerPrefs.GetInt(playOnStartDialogueKey) == 1)
+            {
+                StartCoroutine(ExecuteDialogue(onStartDialogue));
+                PlayerPrefs.SetInt(playOnStartDialogueKey, 0);
+            }
         }
     }
 
