@@ -40,6 +40,22 @@ public class Utils
         }
     }
 
+    public static bool ParseInt(string s, out int v)
+    {
+        try
+        {
+            v = int.Parse(s, CultureInfo.InvariantCulture);
+            return true;
+        }
+        catch
+        {
+            //
+            Debug.LogWarning("Attempted an Invalid Parse");
+            v = 0;
+            return false;
+        }
+    }
+
     public static string GetRepeatingString(string s, int repeat)
     {
         string r = "";

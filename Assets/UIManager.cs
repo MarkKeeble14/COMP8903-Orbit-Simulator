@@ -12,6 +12,7 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] private NumStore activeTimeScale;
     [SerializeField] private int[] possibleTimeScales;
+    [SerializeField] private int startingTimeScaleIndex;
 
     private bool timeScaleLocked;
     private bool paused;
@@ -23,7 +24,7 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        activeTimeScale.SetValue(possibleTimeScales[0]);
+        activeTimeScale.SetValue(possibleTimeScales[startingTimeScaleIndex]);
     }
 
     private void Update()
@@ -60,6 +61,22 @@ public class UIManager : MonoBehaviour
                 if (Input.GetKeyDown(KeyCode.Alpha6))
                 {
                     activeTimeScale.SetValue(possibleTimeScales[5]);
+                }
+                if (Input.GetKeyDown(KeyCode.Alpha7))
+                {
+                    activeTimeScale.SetValue(possibleTimeScales[6]);
+                }
+                if (Input.GetKeyDown(KeyCode.Alpha8))
+                {
+                    activeTimeScale.SetValue(possibleTimeScales[7]);
+                }
+                if (Input.GetKeyDown(KeyCode.Alpha9))
+                {
+                    activeTimeScale.SetValue(possibleTimeScales[8]);
+                }
+                if (Input.GetKeyDown(KeyCode.Alpha0))
+                {
+                    activeTimeScale.SetValue(possibleTimeScales[9]);
                 }
             }
         }

@@ -18,8 +18,12 @@ public class RocketCameraController : MonoBehaviour
 
     public CameraMode mode;
 
-    float rotPerpendicular;
-    float rotParallel;
+    private float rotPerpendicular;
+    private float rotParallel;
+    private float zoom;
+    [SerializeField] private float maxZoom;
+    [SerializeField] private float minZoom;
+    [SerializeField] private float zoomRate;
 
     private float seed;
     [SerializeField] float frequency = 25;
@@ -51,7 +55,7 @@ public class RocketCameraController : MonoBehaviour
             case CameraMode.FIXED:
                 lookRotation = Quaternion.Euler(new Vector2(rotParallel, rotPerpendicular));
                 lookDirection = lookRotation * Vector3.forward;
-                lookPosition = followedObject.position - lookDirection * distance;
+                lookPosition = followedObject.position - lookDirection * (distance + zoom);
                 transform.SetPositionAndRotation(lookPosition + (ShakeActive ? shake : Vector3.zero), lookRotation);
 
                 break;
@@ -59,24 +63,23 @@ public class RocketCameraController : MonoBehaviour
                 lookRotation = Quaternion.Euler(new Vector3(rotParallel, rotPerpendicular,
                     Vector3.Angle(Vector3.up, followedObject.gameObject.GetComponent<Rigidbody>().velocity)));
                 lookDirection = lookRotation * Vector3.forward;
-                lookPosition = followedObject.position - lookDirection * distance;
+                lookPosition = followedObject.position - lookDirection * (distance + zoom);
                 transform.SetPositionAndRotation(lookPosition + (ShakeActive ? shake : Vector3.zero), lookRotation);
                 break;
         }
 
-        /*
-        if (Input.GetKeyDown(KeyCode.V))
+        if (Input.GetKey(KeyCode.Period))
         {
-            if (mode == CameraMode.FIXED)
-            {
-                mode = CameraMode.ORBITAL;
-            }
-            else
-            {
-                mode = CameraMode.FIXED;
-            }
+            zoom -= zoomRate * Time.unscaledDeltaTime;
+            if (zoom < minZoom)
+                zoom = minZoom;
         }
-        */
+        else if (Input.GetKey(KeyCode.Comma))
+        {
+            zoom += zoomRate * Time.unscaledDeltaTime;
+            if (zoom > maxZoom)
+                zoom = maxZoom;
+        }
 
         // Rotation
         if (Input.GetKey(KeyCode.UpArrow))

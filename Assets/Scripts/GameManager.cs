@@ -62,8 +62,8 @@ public class GameManager : MonoBehaviour
 
     private void ResetStores()
     {
-        NumStore[] stores = Resources.LoadAll<NumStore>("Stores");
-        foreach (NumStore store in stores)
+        GameStore[] stores = Resources.LoadAll<GameStore>("Stores");
+        foreach (GameStore store in stores)
         {
             store.Reset();
         }

@@ -5,6 +5,7 @@ using UnityEngine;
 //Not really proper scientific notation, but it should hopefully do the trick
 //to allow *some* kind of math with very large or very small numbers.
 //Like the mass of a planetoid.
+[System.Serializable]
 public struct ScientificNotation
 {
     public float number;
@@ -43,16 +44,22 @@ public struct ScientificNotation
     //Things try to become smaller instead of larger.
     public static ScientificNotation operator +(ScientificNotation lhs, ScientificNotation rhs)
     {
-        if(lhs.exponent == rhs.exponent)
+        if (lhs.exponent == rhs.exponent)
         {
             return new ScientificNotation(lhs.number + rhs.number, lhs.exponent);
-        } 
-        else if(lhs.exponent > rhs.exponent)
+        }
+        else if (lhs.exponent > rhs.exponent)
         {
             return new ScientificNotation(lhs.number + (float)new ScientificNotation(rhs.number, rhs.exponent - lhs.exponent), lhs.exponent);
-        } else
+        }
+        else
         {
             return new ScientificNotation(rhs.number + (float)new ScientificNotation(lhs.number, lhs.exponent - rhs.exponent), rhs.exponent);
         }
+    }
+
+    public override string ToString()
+    {
+        return number + "x10^" + exponent;
     }
 }

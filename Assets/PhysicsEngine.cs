@@ -20,10 +20,9 @@ public class PhysicsEngine : MonoBehaviour
         }
     }
 
-    public ScientificNotation planetMass = new ScientificNotation(1.5f, 17);
-    public ScientificNotation rocketMass = new ScientificNotation(1.0f, 3);
-
-    public ScientificNotation gConst = new ScientificNotation(6.674f, -11);
+    public ScientificNotationStore planetMass;
+    public ScientificNotationStore rocketMass;
+    public ScientificNotationStore gConst;
 
     public Vector3 VelocityVector => rb.velocity; // [m s^-1]
     private Vector3 lastVelocity;
@@ -63,7 +62,7 @@ public class PhysicsEngine : MonoBehaviour
     {
         //Find Local Gravity
         Vector3 gSource = gravityTarget.position - transform.position;
-        float gravForce = (float)(gConst * ((planetMass * new ScientificNotation(Mass, 0)) / new ScientificNotation(gSource.magnitude * gSource.magnitude, 0)));
+        float gravForce = (float)(gConst.GetValue() * ((planetMass.GetValue() * new ScientificNotation(Mass, 0)) / new ScientificNotation(gSource.magnitude * gSource.magnitude, 0)));
 
         // Find Direction of Gravity
         // Debug.Log("a: " + gravForce / (float)rocketMass);
@@ -112,6 +111,24 @@ public class PhysicsEngine : MonoBehaviour
         if (Utils.ParseFloat(s, out mass))
         {
             Mass = mass;
+        };
+    }
+
+    public void SetPlanetMassNumber(string s)
+    {
+        float massNumber;
+        if (Utils.ParseFloat(s, out massNumber))
+        {
+            planetMass.SetNumber(massNumber);
+        };
+    }
+
+    public void SetPlanetMassExponent(string s)
+    {
+        int massExponent;
+        if (Utils.ParseInt(s, out massExponent))
+        {
+            planetMass.SetExpononent(massExponent);
         };
     }
 }
