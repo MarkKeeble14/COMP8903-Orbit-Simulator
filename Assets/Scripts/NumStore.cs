@@ -41,6 +41,11 @@ public class NumStore : GameStore
         maxValue = v;
     }
 
+    public void RemoveMaxValue()
+    {
+        hasMaxValue = false;
+    }
+
     public override void Reset()
     {
         value = defaultValue;

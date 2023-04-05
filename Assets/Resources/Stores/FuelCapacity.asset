@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 421bcdcf75bb54045b4147ab2e111303, type: 3}
   m_Name: FuelCapacity
   m_EditorClassIdentifier: 
-  defaultValue: 50
+  defaultValue: 500
   shouldRound: 0
   roundTo: 1
+  hasMaxValue: 0
+  maxValue: 500

@@ -28,7 +28,6 @@ public class ScientificNotationStore : GameStore
 
     public override void Reset()
     {
-        Debug.Log("SN Reset");
         value = defaultValue;
     }
 }

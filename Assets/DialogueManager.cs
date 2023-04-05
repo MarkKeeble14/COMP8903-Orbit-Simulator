@@ -28,6 +28,8 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private List<DialogueSnippet> onStartDialogue;
     [SerializeField] private GameObject dialogueContainer;
 
+    [SerializeField] private bool forcePlayOnStartDialogue;
+
     private string playOnStartDialogueKey = "PlayOnStartDialogue";
 
     [ContextMenu("SetPlayDialogue")]
@@ -38,7 +40,7 @@ public class DialogueManager : MonoBehaviour
 
     private void Awake()
     {
-        if (!PlayerPrefs.HasKey(playOnStartDialogueKey))
+        if (!PlayerPrefs.HasKey(playOnStartDialogueKey) || forcePlayOnStartDialogue)
         {
             StartCoroutine(ExecuteDialogue(onStartDialogue));
             PlayerPrefs.SetInt(playOnStartDialogueKey, 0);

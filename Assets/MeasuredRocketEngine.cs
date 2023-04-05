@@ -17,6 +17,13 @@ public class MeasuredRocketEngine : RocketEngine
         base.Start();
     }
 
+    protected override void SetFuelCapacity(float f)
+    {
+        fuelCapacityStore.RemoveMaxValue();
+        base.SetFuelCapacity(f);
+        fuelCapacityStore.SetMaxValue(fullFuelCapacity);
+    }
+
     protected new void Update()
     {
         maxThrustStore.SetValue(maxThrust);

@@ -17,6 +17,24 @@ public class UIManager : MonoBehaviour
     private bool timeScaleLocked;
     private bool paused;
 
+    [SerializeField] private float uiMoveRate = 1.0f;
+    [SerializeField] private ShownOrHiddenUIObjectPositioning reportingContainer;
+    [SerializeField] private ShownOrHiddenUIObjectPositioning positioningContainer;
+    [SerializeField] private ShownOrHiddenUIObjectPositioning engineContainer;
+    [SerializeField] private ShownOrHiddenUIObjectPositioning inputContainer;
+
+    [System.Serializable]
+    public struct ShownOrHiddenUIObjectPositioning
+    {
+        public Vector2 ShownPosition;
+        public Vector2 HiddenPosition;
+        public RectTransform UIObject;
+        public bool Shown;
+    }
+
+    private bool canMoveUI;
+    [SerializeField] private float delayCanMoveUI;
+
     private void Awake()
     {
         _Instance = this;
@@ -85,6 +103,47 @@ public class UIManager : MonoBehaviour
         {
             TogglePauseState();
         }
+
+        if (Input.GetKey(KeyCode.LeftAlt))
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                engineContainer.Shown = !engineContainer.Shown;
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                inputContainer.Shown = !inputContainer.Shown;
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                reportingContainer.Shown = !reportingContainer.Shown;
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha4))
+            {
+                positioningContainer.Shown = !positioningContainer.Shown;
+            }
+        }
+
+        if (canMoveUI)
+        {
+            // Move UI
+            MoveUIObjectPositioning(reportingContainer);
+            MoveUIObjectPositioning(positioningContainer);
+            MoveUIObjectPositioning(engineContainer);
+            MoveUIObjectPositioning(inputContainer);
+        }
+        else
+        {
+            delayCanMoveUI -= Time.deltaTime;
+            if (delayCanMoveUI <= 0)
+                canMoveUI = true;
+        }
+    }
+
+    private void MoveUIObjectPositioning(ShownOrHiddenUIObjectPositioning obj)
+    {
+        obj.UIObject.anchoredPosition = Vector2.Lerp(obj.UIObject.anchoredPosition, obj.Shown ? obj.ShownPosition : obj.HiddenPosition,
+            Time.unscaledDeltaTime * uiMoveRate);
     }
 
     public void LockTimeScale(float lockedTimeScale)

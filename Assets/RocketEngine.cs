@@ -163,5 +163,20 @@ public abstract partial class RocketEngine : MonoBehaviour
             this.maxThrust = maxThrust;
         };
     }
+
+    public void SetFuelCapacity(string s)
+    {
+        float fuelCapacity;
+        if (Utils.ParseFloat(s, out fuelCapacity))
+        {
+            SetFuelCapacity(fuelCapacity);
+        };
+    }
+
+    protected virtual void SetFuelCapacity(float f)
+    {
+        fuelCapacity = f;
+        fullFuelCapacity = f;
+    }
 }
 
