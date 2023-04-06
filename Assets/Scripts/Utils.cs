@@ -19,6 +19,22 @@ public class Utils
         return string.Format(format, RoundTo(v.x, roundTo), RoundTo(v.y, roundTo), RoundTo(v.z, roundTo));
     }
 
+    public static string ConvVector3ToString(Vector3 v, int roundTo, string format, float minValue)
+    {
+        float x = v.x > minValue ? v.x : 0;
+        float y = v.y > minValue ? v.y : 0;
+        float z = v.z > minValue ? v.z : 0;
+        return string.Format(format, RoundTo(x, roundTo), RoundTo(y, roundTo), RoundTo(z, roundTo));
+    }
+
+    public static string ConvVector3ToStringAbs(Vector3 v, int roundTo, string format, float minValue)
+    {
+        float x = Mathf.Abs(v.x) > minValue ? v.x : 0;
+        float y = Mathf.Abs(v.y) > minValue ? v.y : 0;
+        float z = Mathf.Abs(v.z) > minValue ? v.z : 0;
+        return string.Format(format, RoundTo(x, roundTo), RoundTo(y, roundTo), RoundTo(z, roundTo));
+    }
+
     public static float RoundTo(float v, int numDigits)
     {
         return (float)System.Math.Round(v, numDigits);
@@ -29,6 +45,22 @@ public class Utils
         try
         {
             v = float.Parse(s, CultureInfo.InvariantCulture);
+            return true;
+        }
+        catch
+        {
+            //
+            Debug.LogWarning("Attempted an Invalid Parse");
+            v = 0;
+            return false;
+        }
+    }
+
+    public static bool ParseInt(string s, out int v)
+    {
+        try
+        {
+            v = int.Parse(s, CultureInfo.InvariantCulture);
             return true;
         }
         catch

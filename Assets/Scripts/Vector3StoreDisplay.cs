@@ -26,8 +26,8 @@ public class Vector3StoreDisplay : StoreDisplay
                     "{1:" + maxDigitLengthString + ".00}, " +
                     "{2:" + maxDigitLengthString + ".00}" +
                     ">";
-                return LabelContent + Utils.ConvVector3ToString(store.GetValue(), 1,
-                    format) + Suffix;
+                return LabelContent + Utils.ConvVector3ToStringAbs(store.GetValue(), 1,
+                    format, minValueToShow) + Suffix;
             }
         }
     }
