@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
 
-[System.Serializable]
-public class AudioClipContainer
+public abstract class AudioClipContainer
 {
-    [SerializeField] private AudioClip clip;
-    public AudioClip Clip => clip;
+    public abstract AudioClip Clip { get; }
     [SerializeField] private float volume = 1;
     public float Volume => volume;
     [SerializeField] private float pitch = 1;
@@ -37,8 +35,8 @@ public class AudioClipContainer
     public void PlayOneShot()
     {
         if (!source) return;
-        if (!clip) return;
+        if (!Clip) return;
         SetRandoms();
-        source.PlayOneShot(clip, volume);
+        source.PlayOneShot(Clip, volume);
     }
 }

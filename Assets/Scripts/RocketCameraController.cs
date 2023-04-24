@@ -68,13 +68,13 @@ public class RocketCameraController : MonoBehaviour
                 break;
         }
 
-        if (Input.GetKey(KeyCode.Period))
+        if (Input.GetKey(KeyCode.Comma))
         {
             zoom -= zoomRate * Time.unscaledDeltaTime;
             if (zoom < minZoom)
                 zoom = minZoom;
         }
-        else if (Input.GetKey(KeyCode.Comma))
+        else if (Input.GetKey(KeyCode.Period))
         {
             zoom += zoomRate * Time.unscaledDeltaTime;
             if (zoom > maxZoom)

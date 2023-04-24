@@ -34,7 +34,9 @@ public abstract partial class RocketEngine : MonoBehaviour
     [Header("Audio")]
     [SerializeField] private ContinuousAudioSource thrustersSFX;
 
+    [Header("References")]
     [SerializeField] private RocketCameraController[] rocketCameraControllers;
+    [SerializeField] private RocketOrbitalTargetSpawning rocketOrbitalTargetSpawning;
 
     private void Awake()
     {
@@ -56,7 +58,6 @@ public abstract partial class RocketEngine : MonoBehaviour
         {
             cameraController.ShakeActive = thrustersAreFiring;
         }
-
 
         if (!thrustersAreFiring) return;
 
@@ -92,6 +93,8 @@ public abstract partial class RocketEngine : MonoBehaviour
             physicsEngine.Mass -= FuelThisUpdate();
 
             ExertForce();
+
+            rocketOrbitalTargetSpawning.SpawnNewOrbitalTarget();
         }
         else
         {

@@ -5,23 +5,17 @@ using TMPro;
 using UnityEngine.UI;
 
 [System.Serializable]
-public struct Speaker
-{
-    public string Name;
-    public Sprite Icon;
-    public Color Color;
-}
-
-[System.Serializable]
 public struct DialogueSnippet
 {
     public string Text;
-    public Speaker Speaker;
     public float Duration;
+    public Speaker Speaker;
 }
 
 public class DialogueManager : MonoBehaviour
 {
+    public static DialogueManager _Instance { get; private set; }
+
     [SerializeField] private Image image;
     [SerializeField] private TextMeshProUGUI text;
     [SerializeField] private float afterSnippetWaitTime = 1f;
@@ -30,9 +24,13 @@ public class DialogueManager : MonoBehaviour
 
     [SerializeField] private bool forcePlayOnStartDialogue;
 
+    [Header("Audio")]
+    [SerializeField] private RandomClipAudioClipContainer onPlayDialogueSnippet;
+
     private string playOnStartDialogueKey = "PlayOnStartDialogue";
 
     private bool dialogueInterrupted => Input.GetMouseButtonDown(0);
+    private Coroutine activeDialogue;
 
     [ContextMenu("SetPlayDialogue")]
     public void SetPlayDialogue()
@@ -42,28 +40,47 @@ public class DialogueManager : MonoBehaviour
 
     private void Awake()
     {
+        if (_Instance != null)
+        {
+            Destroy(gameObject);
+        }
+        _Instance = this;
+    }
+
+    public void TryPlayOnStartDialogue()
+    {
         if (!PlayerPrefs.HasKey(playOnStartDialogueKey) || forcePlayOnStartDialogue)
         {
-            StartCoroutine(ExecuteDialogue(onStartDialogue));
+            PlayDialogue(onStartDialogue);
             PlayerPrefs.SetInt(playOnStartDialogueKey, 0);
         }
         else
         {
             if (PlayerPrefs.GetInt(playOnStartDialogueKey) == 1)
             {
-                StartCoroutine(ExecuteDialogue(onStartDialogue));
+                PlayDialogue(onStartDialogue);
                 PlayerPrefs.SetInt(playOnStartDialogueKey, 0);
             }
         }
+    }
+
+    public void PlayDialogue(List<DialogueSnippet> snippets)
+    {
+        if (activeDialogue != null) StopCoroutine(activeDialogue);
+        activeDialogue = StartCoroutine(ExecuteDialogue(snippets));
     }
 
     // Needs to be called as a coroutine (which it is).
     // Will play the snippets in turn to their full length, and finish when they are all done.
     private IEnumerator ExecuteDialogue(List<DialogueSnippet> snippets)
     {
+        Debug.Log("Executing Dialogue");
+
         dialogueContainer.SetActive(true);
         foreach (DialogueSnippet ds in snippets)
         {
+            onPlayDialogueSnippet.PlayOneShot();
+
             float timeBetweenChars = ds.Duration / ds.Text.Length;
             text.text = "<color=#" + ColorUtility.ToHtmlStringRGBA(ds.Speaker.Color) + ">" +
                 ds.Speaker.Name + ": </color>";
