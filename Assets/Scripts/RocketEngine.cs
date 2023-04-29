@@ -22,6 +22,8 @@ public abstract partial class RocketEngine : MonoBehaviour
     [SerializeField] private bool active;
     public bool Active { get { return active; } set { active = value; } }
 
+    [SerializeField] private bool useObjectPooler;
+
     [SerializeField] private Flame flamePrefab;
     [SerializeField] private Smoke smokePrefab;
     [SerializeField] private Transform enginePosition;
@@ -37,16 +39,31 @@ public abstract partial class RocketEngine : MonoBehaviour
     [Header("References")]
     [SerializeField] private RocketCameraController[] rocketCameraControllers;
     [SerializeField] private RocketOrbitalTargetSpawning rocketOrbitalTargetSpawning;
+    private float addedFuelCapacity;
 
     private void Awake()
     {
         physicsEngine = GetComponent<PhysicsEngine>();
-        fullFuelCapacity = fuelCapacity;
     }
 
-    protected void Start()
+    protected virtual void SetFuelCapacityAndFill(float f)
     {
-        physicsEngine.Mass += fuelCapacity;
+        SetInitialFuelCapacity(f, true);
+    }
+
+    public virtual void SetInitialFuelCapacity(float f, bool autoFill)
+    {
+        physicsEngine.Mass -= addedFuelCapacity;
+        fullFuelCapacity = f;
+        addedFuelCapacity = f;
+        if (autoFill)
+            SetFuelCapacity(f);
+        physicsEngine.Mass += addedFuelCapacity;
+    }
+
+    public virtual void SetMaximumThrust(float f)
+    {
+        maxThrust = f;
     }
 
     protected void Update()
@@ -65,11 +82,20 @@ public abstract partial class RocketEngine : MonoBehaviour
         for (int i = 0; i < mult; i++)
         {
             // Spawn Flame
-            Flame flame = Instantiate(flamePrefab, enginePosition.position, Quaternion.identity);
+            Flame flame;
+            if (useObjectPooler)
+            {
+                flame = ObjectPooler._FlamePool.Get();
+                flame.transform.position = enginePosition.position;
+            }
+            else
+            {
+                flame = Instantiate(flamePrefab, enginePosition.position, Quaternion.identity);
+            }
 
             // Add force to flame
             Vector3 force = -transform.up * flameSpeed;
-            flame.Set(physicsEngine.VelocityVector, force, physicsEngine, physicsEngine.GetGravityTarget());
+            flame.Set(physicsEngine.VelocityVector, force, physicsEngine, physicsEngine.GetGravityTarget(), useObjectPooler);
             SpawnSmoke(physicsEngine.VelocityVector, force, numSmokePerFlame);
         }
     }
@@ -78,8 +104,17 @@ public abstract partial class RocketEngine : MonoBehaviour
     {
         for (int i = 0; i < numToSpawn; i++)
         {
-            Smoke spawned = Instantiate(smokePrefab, enginePosition.position, Quaternion.identity);
-            spawned.Set(velocity, force, physicsEngine.GetGravityTarget());
+            Smoke spawned;
+            if (useObjectPooler)
+            {
+                spawned = ObjectPooler._SmokePool.Get();
+                spawned.transform.position = enginePosition.position;
+            }
+            else
+            {
+                spawned = Instantiate(smokePrefab, enginePosition.position, Quaternion.identity);
+            }
+            spawned.Set(velocity, force, physicsEngine.GetGravityTarget(), useObjectPooler);
         }
     }
 
@@ -89,8 +124,10 @@ public abstract partial class RocketEngine : MonoBehaviour
 
         if (fuelCapacity > FuelThisUpdate())
         {
-            fuelCapacity -= FuelThisUpdate();
-            physicsEngine.Mass -= FuelThisUpdate();
+            float fuelThisUpdate = FuelThisUpdate();
+            SetFuelCapacity(fuelCapacity - fuelThisUpdate);
+            physicsEngine.Mass -= fuelThisUpdate;
+            addedFuelCapacity -= fuelThisUpdate;
 
             ExertForce();
 
@@ -100,7 +137,9 @@ public abstract partial class RocketEngine : MonoBehaviour
         {
             fuelCapacity = 0;
             if (logOutOfFuel)
+            {
                 Debug.LogWarning("Out of Rocket Fuel");
+            }
         }
     }
 
@@ -158,28 +197,27 @@ public abstract partial class RocketEngine : MonoBehaviour
         fuelCapacity = fullFuelCapacity;
     }
 
-    public void SetMaxThrust(string s)
+    public void ParseMaxThrust(string s)
     {
         float maxThrust;
         if (Utils.ParseFloat(s, out maxThrust))
         {
-            this.maxThrust = maxThrust;
+            SetMaximumThrust(maxThrust);
         };
     }
 
-    public void SetFuelCapacity(string s)
+    public void ParseFuelCapacity(string s)
     {
         float fuelCapacity;
         if (Utils.ParseFloat(s, out fuelCapacity))
         {
-            SetFuelCapacity(fuelCapacity);
+            SetFuelCapacityAndFill(fuelCapacity);
         };
     }
 
     protected virtual void SetFuelCapacity(float f)
     {
         fuelCapacity = f;
-        fullFuelCapacity = f;
     }
 }
 

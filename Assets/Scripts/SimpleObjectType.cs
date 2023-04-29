@@ -1,0 +1,6 @@
+﻿public enum SimpleObjectType
+{
+    ORBITAL_TARGET_SPHERE,
+    ORBITAL_TARGET_FACE_Y,
+    ORBITAL_TARGET_FACE_Z
+}

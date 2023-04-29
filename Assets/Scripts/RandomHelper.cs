@@ -118,4 +118,20 @@ public static class RandomHelper
             RandomFloat(new Vector2(-yOffsetRange, yOffsetRange)),
             RandomFloat(new Vector2(-zOffsetRange, zOffsetRange)));
     }
+
+    public static Color GetRandomColor(int minColorComponentValue, int maxColorComponentValue)
+    {
+        return new Color(RandomIntInclusive(minColorComponentValue, maxColorComponentValue),
+            RandomIntInclusive(minColorComponentValue, maxColorComponentValue),
+            RandomIntInclusive(minColorComponentValue, maxColorComponentValue), 255);
+    }
+    public static Color GetRandomColor(int minColorComponentValue)
+    {
+        return GetRandomColor(minColorComponentValue, 255);
+    }
+
+    internal static Vector2 RandomVector2(Vector2 minMaxTextureTiling)
+    {
+        return new Vector2(RandomFloat(minMaxTextureTiling.x, minMaxTextureTiling.y), RandomFloat(minMaxTextureTiling.x, minMaxTextureTiling.y));
+    }
 }

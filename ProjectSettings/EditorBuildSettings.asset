@@ -6,12 +6,48 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: 9790d7cccc9d69e489b007b48da5263c
+  - enabled: 1
+    path: Assets/Scenes/LevelSelect.unity
+    guid: 8ac80ac0721ef6e4d8f4ebad4b1dcbda
+  - enabled: 1
+    path: Assets/Scenes/Win.unity
+    guid: bcc22b221df0fdb47a3a798849fa07de
+  - enabled: 1
+    path: Assets/Scenes/Simulation.unity
+    guid: 07daac10857320f4a8cf28c6a14b7528
+  - enabled: 1
     path: Assets/Scenes/Tutorial.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
-    path: Assets/Scenes/FirstOrbit.unity
+    path: Assets/Scenes/Planets/Lubritov.unity
     guid: 0d812d590a6befb4bbc352aec8bfd040
   - enabled: 1
-    path: Assets/Scenes/Simulation.unity
-    guid: 57e688b31a6ab6448ab6414e0f8ddf33
+    path: Assets/Scenes/Planets/Kallurn.unity
+    guid: b99b637e4be47e047bcbe3976206cc0a
+  - enabled: 1
+    path: Assets/Scenes/Planets/Gagreupra.unity
+    guid: 90a2b12277c3cd14a87de817ebd2a010
+  - enabled: 1
+    path: Assets/Scenes/Planets/Cobagua.unity
+    guid: 4987e6b8b7654af46972c5714e5bd6ea
+  - enabled: 1
+    path: Assets/Scenes/Planets/Huivis.unity
+    guid: 8fdf42b00ce041a4c9aaa7ca0ccaf0b0
+  - enabled: 1
+    path: Assets/Scenes/Planets/Caitera.unity
+    guid: a0f3e96ff9fb37845888c6acc1a2dbda
+  - enabled: 1
+    path: Assets/Scenes/Planets/Xelvoth.unity
+    guid: 99b38eaf87aa6c144a08a0ccc7f9532e
+  - enabled: 1
+    path: Assets/Scenes/Planets/Oiphus.unity
+    guid: d38de2cd4d11b79488eac9bbfd853972
+  - enabled: 1
+    path: Assets/Scenes/Planets/Sithuenides.unity
+    guid: d7665d54248c5e34b8c220ab621565f2
+  - enabled: 1
+    path: Assets/Scenes/Planets/Killuinus.unity
+    guid: c4ffe854c6828a342ae21f7931574ab1
   m_configObjects: {}

@@ -15,6 +15,7 @@ public class NumStore : GameStore
     public bool HasMaxValue => hasMaxValue;
     [SerializeField] private float maxValue;
     public float MaxValue => maxValue;
+    [SerializeField] private bool printValueWhenSet;
 
     public float GetValue()
     {
@@ -33,6 +34,9 @@ public class NumStore : GameStore
             value = (float)System.Math.Round(v, roundTo);
         else
             value = v;
+
+        if (printValueWhenSet)
+            Debug.Log(name + ": " + value);
     }
 
     public void SetMaxValue(float v)

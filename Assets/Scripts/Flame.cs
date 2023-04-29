@@ -20,7 +20,7 @@ public class Flame : PhysicsEngine
         transform.localScale = transform.localScale + (Vector3.one * sizeResult);
     }
 
-    public void Set(Vector3 velocity, Vector3 force, PhysicsEngine adder, Transform gravityTarget)
+    public void Set(Vector3 velocity, Vector3 force, PhysicsEngine adder, Transform gravityTarget, bool useObjectPooler)
     {
         this.gravityTarget = gravityTarget;
 
@@ -38,10 +38,10 @@ public class Flame : PhysicsEngine
         // AddForce(force, adder);
         ChangeSize(force.magnitude);
 
-        StartCoroutine(Lifetime());
+        StartCoroutine(Lifetime(useObjectPooler));
     }
 
-    private IEnumerator Lifetime()
+    private IEnumerator Lifetime(bool useObjectPooler)
     {
         // Scale down over lifetime
         while (Vector3.Distance(transform.localScale, Vector3.zero) > .1f)
@@ -50,7 +50,14 @@ public class Flame : PhysicsEngine
             yield return null;
         }
 
-        Destroy(gameObject);
+        if (useObjectPooler)
+        {
+            ObjectPooler._FlamePool.Release(this);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 }
 

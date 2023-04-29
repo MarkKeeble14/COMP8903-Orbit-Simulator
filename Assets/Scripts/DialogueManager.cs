@@ -10,6 +10,12 @@ public struct DialogueSnippet
     public string Text;
     public float Duration;
     public Speaker Speaker;
+    public DialogueType Type;
+
+    public enum DialogueType
+    {
+        RADIO_CHATTER
+    }
 }
 
 public class DialogueManager : MonoBehaviour
@@ -21,21 +27,30 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private float afterSnippetWaitTime = 1f;
     [SerializeField] private List<DialogueSnippet> onStartDialogue;
     [SerializeField] private GameObject dialogueContainer;
-
     [SerializeField] private bool forcePlayOnStartDialogue;
+    [SerializeField] private bool useDialogueDurations;
+    [SerializeField] private float defaultDurationBetweenChars;
+
+    [Header("Radio Chatter")]
+    [SerializeField] private int maxLengthShortClip = 25;
+    [SerializeField] private int maxLengthMidClip = 100;
 
     [Header("Audio")]
-    [SerializeField] private RandomClipAudioClipContainer onPlayDialogueSnippet;
+    [SerializeField] private RandomClipAudioClipContainer shortRadioChatters;
+    [SerializeField] private RandomClipAudioClipContainer midRadioChatters;
+    [SerializeField] private RandomClipAudioClipContainer longRadioChatters;
 
     private string playOnStartDialogueKey = "PlayOnStartDialogue";
 
-    private bool dialogueInterrupted => Input.GetMouseButtonDown(0);
+    private bool dialogueInterruptedAction => Input.GetMouseButtonDown(0) && Time.deltaTime != 0;
+    private bool dialogueInterruptedActionHard => Input.GetKeyDown(KeyCode.Backspace) && Time.deltaTime != 0;
     private Coroutine activeDialogue;
 
     [ContextMenu("SetPlayDialogue")]
     public void SetPlayDialogue()
     {
         PlayerPrefs.SetInt(playOnStartDialogueKey, 1);
+        PlayerPrefs.Save();
     }
 
     private void Awake()
@@ -53,6 +68,7 @@ public class DialogueManager : MonoBehaviour
         {
             PlayDialogue(onStartDialogue);
             PlayerPrefs.SetInt(playOnStartDialogueKey, 0);
+            PlayerPrefs.Save();
         }
         else
         {
@@ -60,6 +76,7 @@ public class DialogueManager : MonoBehaviour
             {
                 PlayDialogue(onStartDialogue);
                 PlayerPrefs.SetInt(playOnStartDialogueKey, 0);
+                PlayerPrefs.Save();
             }
         }
     }
@@ -70,31 +87,66 @@ public class DialogueManager : MonoBehaviour
         activeDialogue = StartCoroutine(ExecuteDialogue(snippets));
     }
 
+    private void PlayRadioChatterDialogueNoise(int textLength)
+    {
+        if (textLength < maxLengthShortClip)
+        {
+            shortRadioChatters.PlayOneShot();
+        }
+        else if (textLength < maxLengthMidClip)
+        {
+            midRadioChatters.PlayOneShot();
+        }
+        else
+        {
+            longRadioChatters.PlayOneShot();
+        }
+    }
+
     // Needs to be called as a coroutine (which it is).
     // Will play the snippets in turn to their full length, and finish when they are all done.
     private IEnumerator ExecuteDialogue(List<DialogueSnippet> snippets)
     {
-        Debug.Log("Executing Dialogue");
+        // Debug.Log("Executing Dialogue");
 
         dialogueContainer.SetActive(true);
         foreach (DialogueSnippet ds in snippets)
         {
-            onPlayDialogueSnippet.PlayOneShot();
+            switch (ds.Type)
+            {
+                case DialogueSnippet.DialogueType.RADIO_CHATTER:
+                    PlayRadioChatterDialogueNoise(ds.Text.Length);
+                    break;
+            }
 
-            float timeBetweenChars = ds.Duration / ds.Text.Length;
+            float timeBetweenChars = defaultDurationBetweenChars;
+            if (useDialogueDurations)
+                timeBetweenChars = ds.Duration / ds.Text.Length;
             text.text = "<color=#" + ColorUtility.ToHtmlStringRGBA(ds.Speaker.Color) + ">" +
                 ds.Speaker.Name + ": </color>";
             image.sprite = ds.Speaker.Icon;
             image.color = ds.Speaker.Color;
-
+            bool interrupted = false;
             int index = 0;
+
             for (int i = 0; i < ds.Text.Length; i++)
             {
                 char c = ds.Text[i];
                 index++;
                 text.text += c;
 
-                if (dialogueInterrupted)
+                if (dialogueInterruptedAction)
+                {
+                    interrupted = true;
+                }
+
+                if (dialogueInterruptedActionHard)
+                {
+                    ResetDialogueBox();
+                    yield break;
+                }
+
+                if (interrupted)
                 {
                     text.text = "<color=#" + ColorUtility.ToHtmlStringRGBA(ds.Speaker.Color) + ">" +
                         ds.Speaker.Name + ": </color>" + ds.Text;
@@ -107,7 +159,7 @@ public class DialogueManager : MonoBehaviour
                     {
                         afterCharTimer += Time.unscaledDeltaTime;
 
-                        if (dialogueInterrupted)
+                        if (dialogueInterruptedAction)
                         {
                             text.text = "<color=#" + ColorUtility.ToHtmlStringRGBA(ds.Speaker.Color) + ">" +
                                 ds.Speaker.Name + ": </color>" + ds.Text;
@@ -119,23 +171,56 @@ public class DialogueManager : MonoBehaviour
                 }
             }
 
-            yield return new WaitUntil(() => !dialogueInterrupted);
+            interrupted = false;
 
-            // Wait the required time as per snippet description
-            float afterSnippetTimer = 0;
-            while (afterSnippetTimer < afterSnippetWaitTime)
+            yield return new WaitUntil(() => !dialogueInterruptedAction);
+
+            if (useDialogueDurations)
             {
-                if (dialogueInterrupted)
+                // Wait the required time as per snippet description
+                float afterSnippetTimer = 0;
+                while (afterSnippetTimer < afterSnippetWaitTime)
                 {
-                    afterSnippetTimer = afterSnippetWaitTime;
-                }
+                    if (dialogueInterruptedAction)
+                    {
+                        afterSnippetTimer = afterSnippetWaitTime;
+                    }
 
-                afterSnippetTimer += Time.unscaledDeltaTime;
-                yield return null;
+                    if (dialogueInterruptedActionHard)
+                    {
+                        ResetDialogueBox();
+                        yield break;
+                    }
+
+                    afterSnippetTimer += Time.unscaledDeltaTime;
+                    yield return null;
+                }
+            }
+            else
+            {
+                while (!interrupted)
+                {
+                    if (dialogueInterruptedAction)
+                    {
+                        interrupted = true;
+                    }
+
+                    if (dialogueInterruptedActionHard)
+                    {
+                        ResetDialogueBox();
+                        yield break;
+                    }
+                    yield return null;
+                }
             }
         }
 
-        //Clear subtitles after done talking.
+        // Clear subtitles after done talking.
+        ResetDialogueBox();
+    }
+
+    private void ResetDialogueBox()
+    {
         text.text = "";
         dialogueContainer.SetActive(false);
     }
