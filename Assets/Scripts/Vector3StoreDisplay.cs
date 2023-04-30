@@ -8,6 +8,7 @@ public class Vector3StoreDisplay : StoreDisplay
 
     [SerializeField] private bool useMagnitude;
     [SerializeField] private float minValueToShow;
+    [SerializeField] private bool applySuffixPerComponent;
 
     public override string StringContent
     {
@@ -22,12 +23,12 @@ public class Vector3StoreDisplay : StoreDisplay
             else
             {
                 string format = "<" +
-                    "{0:" + maxDigitLengthString + ".00}, " +
-                    "{1:" + maxDigitLengthString + ".00}, " +
-                    "{2:" + maxDigitLengthString + ".00}" +
+                    "{0:" + maxDigitLengthString + ".00}" + (applySuffixPerComponent ? Suffix : "") + ", " +
+                    "{1:" + maxDigitLengthString + ".00}" + (applySuffixPerComponent ? Suffix : "") + ", " +
+                    "{2:" + maxDigitLengthString + ".00}" + (applySuffixPerComponent ? Suffix : "") +
                     ">";
                 return LabelContent + Utils.ConvVector3ToStringAbs(store.GetValue(), 1,
-                    format, minValueToShow) + Suffix;
+                    format, minValueToShow) + (!applySuffixPerComponent ? Suffix : "");
             }
         }
     }

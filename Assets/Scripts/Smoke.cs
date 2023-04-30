@@ -10,7 +10,7 @@ public class Smoke : PhysicsEngine
     [SerializeField] private Vector3 shiftPosBounds = new Vector3(.5f, .5f, .5f);
     [SerializeField] private new Renderer renderer;
 
-    public void Set(Vector3 velocity, Vector3 force, Transform gravityTarget)
+    public void Set(Vector3 velocity, Vector3 force, Transform gravityTarget, bool useObjectPooler)
     {
         this.gravityTarget = gravityTarget.transform;
 
@@ -27,10 +27,10 @@ public class Smoke : PhysicsEngine
         AddForce(force);
         SetVelocity(velocity);
 
-        StartCoroutine(Lifetime());
+        StartCoroutine(Lifetime(useObjectPooler));
     }
 
-    private IEnumerator Lifetime()
+    private IEnumerator Lifetime(bool useObjectPooler)
     {
         // Scale down over lifetime
         while (Vector3.Distance(transform.localScale, Vector3.zero) > .5f)
@@ -39,7 +39,14 @@ public class Smoke : PhysicsEngine
             yield return null;
         }
 
-        Destroy(gameObject);
+        if (useObjectPooler)
+        {
+            ObjectPooler._SmokePool.Release(this);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 }
 

@@ -19,7 +19,6 @@ public class PhysicsEngine : MonoBehaviour
             rb.mass = value;
         }
     }
-
     public ScientificNotationStore planetMass;
     public ScientificNotationStore rocketMass;
     public ScientificNotationStore gConst;

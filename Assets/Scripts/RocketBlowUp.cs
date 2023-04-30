@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class RocketBlowUp : MonoBehaviour
 {
+    public static RocketBlowUp _Instance { get; private set; }
+
     private bool armed;
 
     [SerializeField] private int numOnBlowParticlesIterations = 1;
@@ -18,9 +20,12 @@ public class RocketBlowUp : MonoBehaviour
     [SerializeField] private AnimatorAnimationTriggerData[] onBlowTriggerAnimations;
     [SerializeField] private GameObjectStateData[] afterDelayStateChanges;
 
-    [SerializeField] private float velocityMagnitudeToArmAt;
+    [SerializeField] private float velocityMagnitudeToArmAt = 25.0f;
     [SerializeField] private float maxVelocityCanCollideAt = 10.0f;
     [SerializeField] private V3Store rocketVelocity;
+    [SerializeField] private NumStore rocketAltitude;
+    [SerializeField] private float minRocketAltitudeToWarn = 100.0f;
+    [SerializeField] private GameObject rocketDangerWarningDisplay;
 
     [SerializeField] private MonoBehaviour dummy;
 
@@ -29,9 +34,13 @@ public class RocketBlowUp : MonoBehaviour
 
     [Header("Audio")]
     [SerializeField] private TemporaryAudioSource tempAudioSource;
-    [SerializeField] private AudioClipContainer onBlow;
-    [SerializeField] private AudioClipContainer onArmed;
-    [SerializeField] private AudioClipContainer onCollide;
+    [SerializeField] private SimpleAudioClipContainer onBlow;
+    [SerializeField] private SimpleAudioClipContainer onArmed;
+    [SerializeField] private SimpleAudioClipContainer onCollide;
+
+    public bool AllowArm { get; set; }
+
+    private float lastAltitude;
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -41,6 +50,15 @@ public class RocketBlowUp : MonoBehaviour
         TryBlow();
     }
 
+    private void Awake()
+    {
+        if (_Instance != null)
+        {
+            Destroy(gameObject);
+        }
+        _Instance = this;
+    }
+
     private void Start()
     {
         StartCoroutine(GracePeriod());
@@ -48,7 +66,7 @@ public class RocketBlowUp : MonoBehaviour
 
     public void TryBlow()
     {
-        if (armed && rocketVelocity.GetValue().magnitude > maxVelocityCanCollideAt)
+        if (armed && GameManager._Instance.RocketVelocityTooHighForImpact)
         {
             BlowUp();
         }
@@ -63,7 +81,16 @@ public class RocketBlowUp : MonoBehaviour
 
     private void Update()
     {
+        // Determine if rocket velocity is at a dangerous point
+        bool rocketVelocityTooHigh = rocketVelocity.GetValue().magnitude > maxVelocityCanCollideAt;
+        // Notify Game Manager of rocket velocity so that in the event of a land objective, the game manager knows if the "landing" was actually an fiery explosion
+        GameManager._Instance.RocketVelocityTooHighForImpact = rocketVelocityTooHigh;
+        // Enable/disable warning display depending on if velocity is too high, we are close enough to the planet to care, and we are moving towards the planet (i.e., falling)
+        rocketDangerWarningDisplay.SetActive(armed && rocketVelocityTooHigh && rocketAltitude.GetValue() <= minRocketAltitudeToWarn && lastAltitude > rocketAltitude.GetValue());
+        lastAltitude = rocketAltitude.GetValue();
+
         if (!canArm) return;
+        if (!AllowArm) return;
         if (rocketVelocity.GetValue().magnitude > velocityMagnitudeToArmAt)
         {
             if (armed) return;
@@ -74,6 +101,7 @@ public class RocketBlowUp : MonoBehaviour
     public void Arm()
     {
         armed = true;
+        GameManager._Instance.RocketArmed = true;
 
         onArmed.PlayOneShot();
 
@@ -105,6 +133,9 @@ public class RocketBlowUp : MonoBehaviour
 
     private void BlowUp()
     {
+        // Notify Game Manager
+        GameManager._Instance.RocketExploded = true;
+
         // Lock the Time Scale to 1
         UIManager._Instance.LockTimeScale(1);
 
